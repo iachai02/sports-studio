@@ -9,7 +9,8 @@ This document tracks all implementation tickets. Each ticket includes learning o
 ## Phase 0: Foundation (Weeks 1-2)
 
 ### Ticket #1: Project Structure & uv Workspace Setup
-**Status:** Not Started
+**Status:** COMPLETE
+**Completed:** 2026-02-06
 **Estimated Time:** 2-3 hours
 
 **Learning Objectives:**
@@ -21,12 +22,19 @@ This document tracks all implementation tickets. Each ticket includes learning o
 Set up the monorepo structure with uv workspaces. Create the base directory structure and configure package dependencies.
 
 **Acceptance Criteria:**
-- [ ] Root `pyproject.toml` with workspace configuration
-- [ ] `packages/core/` with its own `pyproject.toml`
-- [ ] `packages/api/` with dependency on `core`
-- [ ] `uv sync` successfully installs all packages
-- [ ] Can import `core` from `api` package
-- [ ] `.gitignore` configured properly
+- [x] Root `pyproject.toml` with workspace configuration
+- [x] `packages/core/` with its own `pyproject.toml`
+- [x] `packages/api/` with dependency on `core`
+- [x] `uv sync` successfully installs all packages
+- [x] Can import `core` from `api` package
+- [x] `.gitignore` configured properly
+
+**Key Learnings:**
+- Monorepos enable atomic commits and shared code without publishing packages
+- uv workspaces: `members` defines packages, `sources` tells uv where to find them
+- Python packaging requires nested structure: `packages/core/core/` (package dir vs importable module)
+- `[build-system]` with hatchling is required for packages to be installable
+- Lock files (uv.lock) should be committed for reproducibility
 
 **Discussion Points:**
 - Why separate packages instead of one big package?
@@ -36,7 +44,8 @@ Set up the monorepo structure with uv workspaces. Create the base directory stru
 ---
 
 ### Ticket #2: Docker Compose for Local Development
-**Status:** Not Started
+**Status:** COMPLETE
+**Completed:** 2026-02-06
 **Estimated Time:** 2-3 hours
 **Depends On:** #1
 
@@ -49,22 +58,28 @@ Set up the monorepo structure with uv workspaces. Create the base directory stru
 Create Docker Compose configuration to run PostgreSQL and MLflow locally.
 
 **Acceptance Criteria:**
-- [ ] `docker-compose.yml` in `infrastructure/docker/`
-- [ ] PostgreSQL 16 container with persistent volume
-- [ ] MLflow container accessible at localhost:5000
-- [ ] `make docker-up` and `make docker-down` commands work
-- [ ] Data persists across container restarts
-- [ ] `.env.example` with required variables
+- [x] `docker-compose.yml` in `infrastructure/docker/`
+- [x] PostgreSQL 16 container with persistent volume
+- [x] MLflow container accessible at localhost:5001 (changed from 5000 due to AirPlay conflict)
+- [x] `make docker-up` and `make docker-down` commands work
+- [x] Data persists across container restarts
+- [x] `.env.example` with required variables
 
-**Discussion Points:**
-- Why use Docker instead of installing PostgreSQL directly?
-- What happens to data when you `docker-compose down`?
-- Why do we need volumes?
+**Key Learnings:**
+- Images = blueprints (like classes), Containers = running instances (like objects)
+- Volumes persist data outside containers - critical for databases
+- Port mapping: `host:container` format (e.g., `5001:5000`)
+- macOS AirPlay uses port 5000 - common conflict for developers
+- PostgreSQL only creates users from env vars on FIRST initialization (empty data dir)
+- Use `docker compose down -v` to remove volumes and start fresh
+- Makefiles require TAB characters (not spaces) for indentation
+- `.PHONY` declares targets that aren't actual files
 
 ---
 
 ### Ticket #3: FastAPI Skeleton with Health Check
-**Status:** Not Started
+**Status:** COMPLETE
+**Completed:** 2026-02-06
 **Estimated Time:** 2-3 hours
 **Depends On:** #1
 
@@ -77,17 +92,25 @@ Create Docker Compose configuration to run PostgreSQL and MLflow locally.
 Create the basic FastAPI application structure with a health check endpoint.
 
 **Acceptance Criteria:**
-- [ ] `packages/api/api/main.py` with app factory
-- [ ] `/api/v1/health` endpoint returns `{"status": "healthy"}`
-- [ ] OpenAPI docs available at `/docs`
-- [ ] `make dev` runs the API at localhost:8000
-- [ ] Tests for health endpoint (TDD: write test first!)
+- [x] `packages/api/api/main.py` with app factory
+- [x] `/api/v1/health` endpoint returns `{"status": "healthy"}`
+- [x] OpenAPI docs available at `/docs`
+- [x] `make dev` runs the API at localhost:8000
+- [x] Tests for health endpoint (TDD: write test first!)
 
 **TDD Approach:**
 1. Write test: `test_health_returns_200()`
 2. Run test (should fail)
 3. Implement endpoint
 4. Run test (should pass)
+
+**Key Learnings:**
+- App factory pattern: create app inside a function to control instantiation timing (critical for testing with different configs)
+- TDD workflow: Red (failing test) → Green (make it pass) → Refactor
+- TestClient from starlette.testclient lets you test endpoints without running a real server
+- uv dependency groups: dev dependencies go in `[dependency-groups]` section
+- Uvicorn `--factory` flag tells it that the import path points to a factory function, not an app instance
+- pytest auto-discovers test functions starting with `test_` — no main block needed
 
 **Discussion Points:**
 - Why use an app factory instead of a global `app` object?
