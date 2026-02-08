@@ -4,34 +4,43 @@ This file provides guidance to Claude Code when working in this repository.
 
 ## Agent Workflow
 
-**CRITICAL:** This is a learning-focused project. Use the appropriate agent for each phase of work.
+**CRITICAL:** This is a learning-focused project. `socratic-mentor` is the PRIMARY agent that runs continuously and calls on other agents when needed.
 
 ### Available Agents
 
 | Agent | Purpose | When to Use |
 |-------|---------|-------------|
-| `socratic-mentor` | Socratic guidance for planning & implementation | Ticket kickoff, design decisions, getting unstuck, debugging |
-| `senior-reviewer` | PR-style code review | After finishing a ticket or wanting code review |
-| `ml-systems-mentor` | Data/ML/LLM system design | Pipelines, model eval, RAG, monitoring, data quality |
+| `socratic-mentor` | PRIMARY — Socratic guidance for all teaching | Always running; orchestrates other agents |
+| `senior-reviewer` | PR-style code review | Called BY socratic-mentor when reviewing code |
+| `ml-systems-mentor` | Data/ML/LLM system design | Called BY socratic-mentor for ML topics |
+
+### Agent Orchestration
+
+**`socratic-mentor` is ALWAYS the primary agent.** It:
+- Runs throughout the entire ticket
+- Calls `senior-reviewer` when code review is needed
+- Calls `ml-systems-mentor` when ML/data topics arise
+- Synthesizes feedback from other agents into teaching moments
 
 ### Standard Ticket Flow
 
-1. **Start with `socratic-mentor`**
-   - Provide: requirements + acceptance criteria
-   - Explain: proposed plan + tradeoffs
-   - Output: final plan + optional sub-tasks
+1. **`socratic-mentor` runs throughout the entire ticket**
+   - Always active for teaching, guidance, and debugging
+   - Ask questions before explaining; guide through hints
+   - Never stops — this is the primary teaching agent
 
 2. **Implement (user writes the code)**
    - User writes code, runs tests, collects logs/errors
    - No AI generating the whole solution
 
-3. **Review with `senior-reviewer`**
-   - Provide: diff/snippets, test results, edge case notes
-   - Apply requested changes, repeat if needed
+3. **Code review: `socratic-mentor` calls `senior-reviewer`**
+   - `senior-reviewer`: Provides direct, actionable code review
+   - `socratic-mentor`: Explains WHY issues matter, teaches concepts
+   - Both perspectives combined in response
 
-4. **If ticket touches data/ML/LLMs, consult `ml-systems-mentor`**
-   - Provide: data sources, metrics, latency/cost constraints
-   - Output: eval plan + monitoring plan
+4. **ML/Data topics: `socratic-mentor` calls `ml-systems-mentor`**
+   - Get specialized guidance on pipelines, eval, monitoring
+   - `socratic-mentor` translates into learning moments
 
 ### Agent Rules
 

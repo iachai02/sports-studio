@@ -1,4 +1,4 @@
-.PHONY: docker-up docker-down dev
+.PHONY: docker-up docker-down dev migrate
 
 docker-up:
 	docker compose -f infrastructure/docker/docker-compose.yml up -d
@@ -9,3 +9,5 @@ docker-down:
 dev:
 	uv run uvicorn api.main:create_app --factory --reload --port 8000
 
+migrate:
+	cd packages/core/ && uv run alembic upgrade head
