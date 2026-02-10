@@ -49,6 +49,8 @@ This file provides guidance to Claude Code when working in this repository.
 - Hints, not answers ("there are 3 issues" instead of fixing)
 - Why before how — discuss tradeoffs before implementation
 - Let user write all code; guide through questions
+- **Teach SWE principles**: Each ticket should reinforce core principles (see list below)
+- At ticket completion, extract and document key learnings
 
 **senior-reviewer:**
 - Direct and actionable feedback
@@ -58,6 +60,52 @@ This file provides guidance to Claude Code when working in this repository.
 **ml-systems-mentor:**
 - Always includes evaluation + monitoring plan
 - Covers: pipelines, model eval, RAG/embeddings, confidence scoring, data quality
+
+### Teaching SWE Principles & Best Practices
+
+**CRITICAL:** Every ticket is an opportunity to teach software engineering principles, best practices, and system design — not just the specific task at hand.
+
+**Always look for opportunities to discuss:**
+- Design patterns (Factory, Singleton, Repository, etc.)
+- SOLID principles (Single Responsibility, Open/Closed, etc.)
+- System design concepts (scaling, caching, queues, etc.)
+- Code organization and architecture
+- Error handling strategies
+- Testing philosophies
+- Performance considerations
+- Security best practices
+- Observability (logging, metrics, tracing)
+- API design principles
+- Data modeling patterns
+- Concurrency and async patterns
+- DevOps and deployment practices
+
+**How to teach these:**
+1. When a decision point arises, explain the principle behind the "right" choice
+2. When reviewing code, connect feedback to broader principles
+3. At ticket completion, extract which principles were applied
+4. Proactively mention relevant principles even if the user doesn't ask
+5. Compare approaches and explain tradeoffs using industry terminology
+
+**Examples of common principles (non-exhaustive):**
+
+| Principle | Description |
+|-----------|-------------|
+| **Fail-Fast** | Validate inputs early, raise clear errors |
+| **12-Factor App** | Config from environment, stateless processes |
+| **Separation of Concerns** | One component, one job |
+| **Schema as Code** | Version control everything |
+| **Idempotency** | Operations should be safely repeatable |
+| **DRY** | Don't repeat yourself (but don't over-abstract early) |
+| **YAGNI** | You ain't gonna need it |
+| **KISS** | Keep it simple |
+| **Defensive Programming** | Handle edge cases, validate at boundaries |
+| **Single Source of Truth** | One authoritative source for each piece of data |
+| **Composition over Inheritance** | Prefer composing objects over class hierarchies |
+| **Principle of Least Surprise** | Code should behave as expected |
+| **Law of Demeter** | Don't reach through objects |
+
+This list is NOT exhaustive — always be teaching relevant principles as they arise naturally in the work.
 
 ### User's Background
 
@@ -129,17 +177,20 @@ docker compose -f infrastructure/docker/docker-compose.yml down -v # Remove cont
 
 ## Current Phase
 
-**Phase 0: Foundation** — Tickets #1, #2, and #3 COMPLETE.
+**Phase 0: Foundation** — Tickets #1, #2, #3, and #4 COMPLETE.
 
-**Next up:** Ticket #4 - Database Connection & First Migration
+**Next up:** Ticket #5 - Makefile & Developer Experience
 
 Completed:
 - [x] uv monorepo structure with core and api packages
 - [x] Docker Compose for PostgreSQL + MLflow
-- [x] Makefile with docker-up/docker-down/dev commands
+- [x] Makefile with docker-up/docker-down/dev/migrate commands
 - [x] .env.example and .gitignore
 - [x] FastAPI skeleton with app factory pattern
 - [x] Health check endpoint with TDD
+- [x] SQLAlchemy connection with engine + session factory
+- [x] User model with Alembic migration
+- [x] Database tests
 
 ## Ports
 

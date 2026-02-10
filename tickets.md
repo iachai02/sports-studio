@@ -120,7 +120,8 @@ Create the basic FastAPI application structure with a health check endpoint.
 ---
 
 ### Ticket #4: Database Connection & First Migration
-**Status:** Not Started
+**Status:** COMPLETE
+**Completed:** 2026-02-07
 **Estimated Time:** 3-4 hours
 **Depends On:** #2, #3
 
@@ -133,18 +134,27 @@ Create the basic FastAPI application structure with a health check endpoint.
 Set up SQLAlchemy connection to PostgreSQL and create the first migration (users table).
 
 **Acceptance Criteria:**
-- [ ] `packages/core/core/db/connection.py` with engine setup
-- [ ] `packages/core/core/db/models.py` with User model
-- [ ] Alembic initialized with first migration
-- [ ] `make migrate` applies migrations
-- [ ] Can create a user in the database via Python
-- [ ] Tests for database connection
+- [x] `packages/core/core/db/connection.py` with engine setup
+- [x] `packages/core/core/db/models.py` with User model
+- [x] Alembic initialized with first migration
+- [x] `make migrate` applies migrations
+- [x] Can create a user in the database via Python
+- [x] Tests for database connection
 
 **TDD Approach:**
 1. Write test: `test_can_create_user()`
 2. Implement User model and connection
 3. Create migration
 4. Test passes
+
+**Key Learnings:**
+- **Fail-Fast with Clear Errors**: Add null checks with clear error messages (e.g., `raise ValueError("DATABASE_URL not set")`). Don't let bad state propagate deep into library code.
+- **Configuration from Environment (12-Factor App)**: Load DATABASE_URL from `.env`, never hardcode credentials. Same code should be deployable anywhere.
+- **Schema as Code (Database Migrations)**: Alembic tracks schema changes in versioned files. Database structure should be version-controlled like code. Never make manual schema changes.
+- **Separation of Concerns**: Engine (connection pool, created once) vs Session (unit of work, per-request). Different responsibilities belong in different components.
+- **Idempotency / Test Cleanup**: Tests should delete what they create so they can run repeatedly. Operations should be repeatable.
+- **Import Order Matters**: Load environment variables (`load_dotenv()`) before importing modules that read from environment at import time.
+- **Workspace Dev Dependencies**: In uv workspaces, shared dev tools like pytest should go in root `pyproject.toml` to be available across all packages.
 
 **Discussion Points:**
 - What is a database migration? Why not just `CREATE TABLE` manually?
@@ -154,7 +164,8 @@ Set up SQLAlchemy connection to PostgreSQL and create the first migration (users
 ---
 
 ### Ticket #5: Makefile & Developer Experience
-**Status:** Not Started
+**Status:** COMPLETE
+**Completed:** 2026-02-07
 **Estimated Time:** 1-2 hours
 **Depends On:** #1, #2, #3
 
@@ -174,6 +185,14 @@ Create a Makefile with common development commands.
 - [ ] `make lint` - Run linters (ruff)
 - [ ] `make help` - Show available commands
 
+**Key Learnings:**
+- **Convention Over Configuration**: Standard targets (`make dev`, `make test`) work across projects - devs don't need to learn new commands
+- **Single Source of Truth / DRY**: `## description` comments live next to targets - one place to update
+- **Self-Documenting Systems**: `make help` uses grep/awk to extract docs automatically
+- **Defensive Defaults**: `.PHONY` protects against file name conflicts (e.g., a file named `test` would break `make test`)
+- **Safe Defaults**: `help` as the default target - running `make` alone is informative, not destructive
+- Makefiles provide reproducibility, discoverability, and fast onboarding
+
 **Discussion Points:**
 - Why use a Makefile instead of just documenting commands?
 - What makes good developer experience?
@@ -183,7 +202,8 @@ Create a Makefile with common development commands.
 ## Phase 1: Data Layer (Weeks 3-4)
 
 ### Ticket #6: NBA API Data Loader with Caching
-**Status:** Not Started
+**Status:** COMPLETE
+**Completed:** 2026-02-10
 **Estimated Time:** 4-5 hours
 **Depends On:** #4
 
@@ -208,6 +228,15 @@ Create a data loader that fetches NBA data with rate limiting and disk caching.
 2. Write test: `test_respects_rate_limit()`
 3. Implement data loader
 4. Tests pass
+
+**Key Learnings:**
+- **Mocking External APIs**: Use `patch()` and `side_effect` to fake API calls in tests
+- **Exception Translation**: Catch low-level exceptions (Exception), raise high-level custom exceptions (NBADataLoaderError)
+- **Dependency Injection**: Pass cache into class instead of creating internally - enables testing with temp directories
+- **TDD Workflow**: Red (failing test) → Green (make it pass) → Refactor
+- **Testing Time-Based Features**: Use short TTL (seconds) in tests vs production (24 hours)
+- **Rate Limiting Pattern**: Check elapsed time BEFORE request, sleep remaining time if needed, update timestamp AFTER request
+- **Endpoint Selection**: Choose bulk endpoints (LeagueDashPlayerStats) over per-item endpoints to minimize API calls
 
 **Discussion Points:**
 - Why cache API responses? What are the tradeoffs of TTL length?
